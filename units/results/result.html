@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>result</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <p>
+            <b>
+                Al-Azhar faculty of Medicine<br>
+                Sayed Galal Universty Hospital<br>
+                Clinical Pathology Department<br>
+                Hormons & Tumer Markers Unit
+            </b>
+        </p>
+        <img src="image/logo1.jpg" width="150" height="150" style="transform: translateY(10px)">
+        <p dir="rtl">
+            <b>
+                كلية طب الازهر<br>
+                مستشفي سيد جلال الجامعي <br>
+                قسم الباثولوجيا الاكلينيكية <br>
+                وحدة الهرمونات ودلالات الاورام
+
+            </b>
+        </p>
+    </header>
+    <hr>
+    <span class="patient" dir="rtl">
+        <b id="name">الاسم: </b>
+    </span>
+    <br>
+    <span class="patient" dir="rtl">
+        <b id="date">التاريخ: </b>
+    </span>
+    <hr>
+    <h2><ins>Laboratory Report</ins></h2><br>
+    <h3 style=><ins>Ref.Range</ins></h3>
+    <div id="contain"></div>
+    <footer>
+        <img src="image/logo2.png">
+        <span><b><ins>وحدة الهرمونات مستشفي باب الشعرية</ins></b></span>
+    </footer>
+    <div class="hide button">
+        <button onclick="window.print()">print</button>
+        <button onclick="window.close()">close</button>
+
+    </div>
+</body>
+<script>
+    //LabSystem\units\results\result.html
+    //LabSystem\settings\edit.php
+
+    let url = new URL(window.location.href);
+    TESTS = {}
+    let getTest = new XMLHttpRequest();
+    getTest.open('post', '../../settings/edit.php', true);
+    getTest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    getTest.onloadend = function () {
+        TESTS = JSON.parse(getTest.responseText);
+        data = JSON.parse(url.searchParams.get("tests"));
+        Object.keys(data).forEach(test => {
+
+            document.getElementById("contain").innerHTML+=`<div class="testContain"><span class="stestName">${test}</span><span class="stestValue">${data[test]+" "+TESTS[test][1]}</span><span class="ref">${TESTS[test][0]}</span></div><br>`;
+        });
+
+    }
+    getTest.send('state=getref');
+    document.getElementById("name").innerText += url.searchParams.get("name");
+    document.getElementById("date").innerText += url.searchParams.get("date");
+
+
+
+
+
+</script>
+
+</html>

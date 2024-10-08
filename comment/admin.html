@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>edit table</title>
+        <style>
+            html,body{
+                height: 99%;
+            }
+            .contain{
+                height: 99%;
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+            }
+            .tables{
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+            }
+            .tables .select{
+                background-color: blue;
+                color: yellow;
+                text-align: center;
+            }
+            .tables .select, .switch span{
+                cursor:pointer;
+            }
+            .switch{
+                display: flex;
+                justify-content: space-around;
+            }
+            .edit , .add{
+                text-align: center;
+            }
+            .hidden{
+                display: none;
+            }
+            .active{
+                border-bottom: solid cyan;
+            }
+        </style>
+    </head>
+    <body>
+        <div class=contain>
+            <!-- display table -->
+            <div class=tables></div>
+            <div style="width: 100%;">   <!--  edit taple -->
+                    <div class='switch'>
+                        <span>edit</span>
+                        <span>add</span>
+                    </div>
+                <div class='add'></div>
+                <div class='edit'>
+                
+                    
+                    <div id='btn'>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        let select=document.querySelectorAll(".select");
+        let input=document.querySelector("input");
+        let form=document.querySelector("form");
+        let Edits=document.querySelectorAll(".switch span")[0];
+        let Adds=document.querySelectorAll(".switch span")[1];
+        let Add=document.querySelector(".add");
+        let Edit=document.querySelector(".edit");
+        let resonse=document.getElementById("response");
+        Add.classList.add('hidden')
+        Edits.classList.add("active")
+        fill("tables");
+        changeTable("select","tests",'edit');
+
+        Edits.addEventListener('click',function(event) {
+            Edit.classList.remove('hidden')
+            Add.classList.add('hidden')
+            this.classList.add('active')
+            Adds.classList.remove('active')
+            })
+        Adds.addEventListener('click',function(event) {
+            Add.classList.remove('hidden')
+            Edit.classList.add('hidden')
+            this.classList.add('active')
+            Edits.classList.remove('active')
+            changeTable("select","tests",'add');
+            })
+        function changeTable(state,table,contan) {
+            xhrChange=new XMLHttpRequest();
+            xhrChange.open("post","../settings/edit.php",true);
+            xhrChange.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            xhrChange.onreadystatechange=function(){
+                document.querySelector(`.${contan}`).innerHTML=xhrChange.responseText;
+            }
+            xhrChange.send(`state=${state}&table=${table}&edit=${contan}`); 
+        }
+        function fill(target) {
+            let contan=document.querySelector(`.${target}`);
+            xhrFill=new XMLHttpRequest();
+            xhrFill.open("post","../settings/edit.php",true);
+            xhrFill.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            xhrFill.onreadystatechange=function(){
+                contan.innerHTML=xhrFill.responseText;
+                select=document.querySelectorAll(".select");
+                input=document.querySelector("input");
+                form=document.querySelector("form");
+                Edits=document.querySelectorAll(".switch span")[0];
+                Adds=document.querySelectorAll(".switch span")[1];
+                Add=document.querySelector(".add");
+                Edit=document.querySelector(".edit");
+                resonse=document.getElementById("response");
+                select.forEach(function (el,i) {
+                el.addEventListener("click",function (event) {
+                    changeTable("select",el.innerTEXT,'add');
+                });
+            });
+            }
+            xhrFill.send("state=tables"); 
+        }
+            function request(state) {
+                let inputs=document.querySelectorAll(`.${state} input`);
+                let values="";
+                inputs.forEach(function(el,i) {
+                    values+="'"+el.value+"',";
+                });
+                xhr=new XMLHttpRequest();
+                xhr.open("post","../settings/edit.php",true);
+                xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+                xhr.onreadystatechange=function(){
+                    contan.innerHTML=xhr.responseText;
+                }
+                xhr.send(`state=${state}&keys=${keys.substring(0,keys.length-1)}&values=${values.substring(0,values.length-1)}`);
+                
+                
+               
+            }
+    </script>
+</html>

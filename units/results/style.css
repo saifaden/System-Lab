@@ -1,0 +1,109 @@
+header{
+    display: flex;
+    justify-content: space-around;
+}
+header{
+    display: flex;
+    justify-content: space-around;
+}
+header p,.patient{
+    font-size: 25px;
+}
+span{
+    width: 99%;
+    text-align: start;
+    display: block;
+    z-index: 1;
+}
+footer{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    bottom:5%;
+    left: 45%;
+    width: 99%;
+    translate: -60px;
+}
+.result{
+    padding-left: 30px;
+    font-size: larger;
+    font-weight: bold;
+    display: flex;
+}
+p[dir='rtl']{
+    translate: -10px;
+}
+.patient{
+    translate: -20px;
+}
+h2{
+    display: block;
+    text-align:center;
+}
+h3{
+    display: block;
+    text-align:end; 
+    width:99%;
+    translate: -60px;
+}
+footer img{
+    translate: -45px;
+    width: 400px;
+    height: 500px;
+}
+footer{
+    display: none;
+}
+.ref{
+    translate: 100px;
+}
+img{
+    display: none;
+}
+.testContain{
+    display: flex;
+}
+.testContain span{
+    font-size: 20px;
+    font-weight: bold;
+}
+section{
+    position: absolute;
+    top: 5px;
+    width: 100px;
+    height: 99%;
+    background-color: aqua;
+}
+section span{
+    cursor: pointer;
+    background: yellow;
+    color: red;
+    text-align: center;
+    margin-bottom:5px;
+}
+.btnp{
+    translate: 0px -135px;
+}
+
+
+
+@media print {
+    footer,img{
+        display: block;
+    }
+    input{
+        display: none;
+    }
+    button{
+        display: none;
+    }
+    footer span{
+        color: crimson;
+        font-size:40px;
+        translate: -70px;
+    }
+    #data{
+        display: none;
+    }
+}
+

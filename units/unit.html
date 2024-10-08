@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title></title>
+        <style>
+             header{
+                background-color: red;
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+            .edit{
+                position: absolute;
+            }
+            .edit input{
+                margin: 3px;
+            }
+            .contant{
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .tests{
+                overflow: auto;
+                padding: 5px;
+                /* position: absolute; */
+                display: inline-block;
+                background-color: aquamarine;
+                height:85%;
+                width: max-content;
+                text-align: center;
+            }
+            .p_test{
+                overflow: auto;
+                padding: 5px;
+                height:85%;
+                width: 75%;
+                text-align: center;
+            }
+            .patient_test{
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .patient_test span{
+                display: inline-block;
+            }
+
+            .patient{
+                background-color: cadetblue                                                                          ;
+                border-bottom: 5px solid chartreuse;
+                margin-bottom: 5px;
+            }
+            
+            .patient span{
+                margin: 10px;
+                background-color: gold;
+                color: blueviolet;
+                width: 100px;
+                text-align: center;
+            }
+            /* .patient_test input,.patient_test button{
+                margin-bottom: 10px;
+            } */
+            /* .p_test{
+                display: flex;
+            } */
+            .p_data {
+                display: flex;
+                justify-content: space-evenly;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <button onclick="editition()"></button>
+            <div class='edit'>
+                <input type="password" name="old_password" placeholder='enter old password'><br>
+                <input type="password" name="new_password1" placeholder='enter new password'><br>
+                <input type="password" name="new_password2" placeholder='confirm new password'><br>
+                <button onclick="submit()">submit</button>
+                <span class="result"></span>
+            </div>
+        </header>
+        <div class="contant">
+            <div class="tests"></div>
+            <div class="p_test"></div>
+        </div>
+    </body>
+    <script>
+        let span=document.querySelector(".result");
+        let edit=document.querySelector(".edit");
+        edit.style.display="none";
+        let shown=false;
+        url=new URL(window.location.href);
+        document.querySelector("title").innerText=url.searchParams.get("unit")+" unit";
+        document.querySelector("button[onclick='editition()']").innerText=url.searchParams.get("userName");
+        // start get test amount
+        let tests=new XMLHttpRequest();
+        tests.open("post","../settings/gettests.php",true);
+        tests.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        tests.send(`stuts=gettests&unit=${new URL(window.location.href).searchParams.get("unit")}`);
+        tests.onloadend=function(){
+          let div=document.querySelector(".tests");
+          let test=JSON.parse(tests.responseText);
+          test.forEach(Test => {
+            div.innerHTML+=`<div><span>${Test.testName}</span><br><input type=text value='${Test.amount}'><button onclick='saveTest("${Test.testName}")'>Save</button></div>`;
+          });
+        }
+        // end get test amount
+
+        // start get patient tests
+        //setInterval(function() {
+        let p_tests=new XMLHttpRequest();
+        p_tests.open("post","../settings/gettests.php",true);
+        p_tests.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        p_tests.send(`stuts=get&unit=${new URL(window.location.href).searchParams.get("unit")}`);
+        p_tests.onloadend=function(){
+          let div=document.querySelector(".p_test");
+          let p_test=JSON.parse(p_tests.responseText);
+          if (p_test.length>0) {
+            for (let index = 0; index < p_test.length; index++) {
+                if (index==0 ||(p_test[index-1].id!=p_test[index].id) ) {
+                    div.innerHTML+=`<div  class='patient'>
+                        <div class='p_data'>
+                            <span>${p_test[index].name}</span>
+                            <span>${p_test[index].id}<span>
+                        </div>
+                        <div class='patient_test A${p_test[index].id}'>
+                            <div>
+                                <span class='testName'>${p_test[index].testName}</span><input type='text' value="${p_test[index].value?p_test[index].value:""}">
+                                <button onclick="deletetest('${p_test[index].id}' , '${p_test[index].testName}')" >delete</button>
+                            </div>
+                        </div>
+                        <button  id='A${p_test[index].id}' onclick='savetest(this.parentElement)'>save</button>
+                        </div>`;
+                }else{
+                    let el=document.querySelector(`.A${p_test[index].id}`);
+                    el.innerHTML+=`<div>
+                        <span class='testName'>${p_test[index].testName}</span><input type='text' value="${p_test[index].value?p_test[index].value:""}">
+                        <button  onclick="deletetest('${p_test[index].id}' , '${p_test[index].testName}')" >delete</button>
+                        </div>`
+                }
+                
+            }
+         }else{
+            div.innerHTML="<div>no test found</div>"
+         }
+          }
+        //},1000);
+        // end get patient test amount
+
+
+
+
+        function editition() {
+            if (shown) {
+                edit.style.display="none";
+                shown=false;
+            }else{
+                edit.style.display="inherit";
+                shown=true;
+            }
+        }
+
+        function submit() {
+            let input1=document.querySelectorAll("input")[0];
+            let input2=document.querySelectorAll("input")[1];
+            let input3=document.querySelectorAll("input")[2];
+            let xhrsub=new XMLHttpRequest();
+            xhrsub.open("post","../settings/users.php",true);
+            
+            xhrsub.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            xhrsub.onreadystatechange=function(){
+                span.innerText=xhrsub.responseText;
+            }
+            if (input2.value==input3.value) {
+                xhrsub.send(`stuts=edit&old=${input1.value}&new=${input2.value}&userName=${url.searchParams.get("userName")}`);
+            }else{
+                span.innerText="new password1 not match new password2";
+            }
+            
+        }
+
+        function saveTest(testName) {
+            console.log(testName);
+            let tests=document.querySelectorAll(".tests div");
+            let inputs=document.querySelectorAll(".tests input");
+            let xhrsave=new XMLHttpRequest();
+            xhrsave.open("post","../settings/gettests.php",true);
+            xhrsave.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            tests.forEach(function(el,i){
+                if (testName==el.innerText.split("\n")[0]) {
+                    xhrsave.send(`stuts=settests&test=${testName}&Amount=${inputs[i].value}`)
+                } 
+            });
+            testsave.onloadend=location.reload(); 
+        }
+
+    function savetest(el) {
+        let id=el.querySelectorAll("span")[1].innerText;
+        let tests=el.querySelectorAll(".testName");
+        let values=el.querySelectorAll("input");
+        let data={};
+        tests.forEach(function (el,i) {
+            data[el.innerText]=values[i].value
+        })
+        let testsave=new XMLHttpRequest();
+            testsave.open("post","../settings/gettests.php",true);
+            testsave.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            testsave.onload=function(){
+                console.log(testsave.responseText);
+            }
+            testsave.send(`stuts=savetest&id=${id}&data=${JSON.stringify(data)}`);
+       
+    }
+    function deletetest(id,testName) {
+        let deletetest=new XMLHttpRequest();
+        deletetest.open("post","../settings/gettests.php",true);
+        deletetest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        deletetest.send(`stuts=deletesave&testName=${testName}&id=${id}`)
+        deletetest.onloadend=function(){
+                location.reload();
+            }
+        
+        
+    }
+    </script>
+</html>

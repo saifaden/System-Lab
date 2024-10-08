@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Saif lab|login</title>
+        <style>
+            html{
+                background-image: url("assets/images/labBackground.jpg");
+                background-size: cover;
+                height: 100%;
+            }
+            .contain{
+                padding: 20px;
+                background-color: red;
+                width: fit-content;
+                border: dotted yellow 5px;
+            }
+            input[type='submit']{
+                background-color: yellow;
+                translate:125px;
+            }
+            #status{
+                color: rgb(200, 255, 0);
+                cursor: move;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="contain">
+            <form action="admin.php" method="post">
+                <span id="status"></span><br>
+                <input type="text" name="username" required placeholder="enter your username"><br><br>
+                <input type="password" name="password" required placeholder="enter your password"><br><br>
+                <input type="submit" value="login">
+            </form>
+        </div>
+        <input type="hidden" name="table" formmethod="">
+    </body>
+    <script>
+        let url=new URL(window.location.href);
+        let stspan=document.getElementById("status");
+        if (url.searchParams.get("status")==1) {
+            stspan.innerText="userName or password is not correct";
+        }else if(url.searchParams.get("status")==2){
+            stspan.innerText="your session is finished";
+            //erspan.classList.remove("hide");
+        }else{
+            stspan.innerText="";
+        }
+        
+    </script>
+</html>

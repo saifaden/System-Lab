@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>registration</title>
+    <style>
+        input,
+        select {
+            width: 80%;
+            margin: 10px 50px;
+        }
+
+        .btn {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .test {
+            display: none;
+        }
+
+        .test_p {
+            text-align: center;
+            background-color: darkcyan;
+            margin-bottom: 5px;
+        }
+        .switch{
+            display: flex;
+            justify-content: space-around;
+        }
+        .active{
+            border-bottom: solid cyan;
+        }
+        .hidden{
+            display: none;
+        }
+        .switch span{
+            cursor:pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="details">
+        <input required type="text" name="id" placeholder="ID"><br>
+        <input required type="text" name="name" placeholder="Name"><br>
+        <input required type="text" name="age" placeholder="age"><br>
+        <input required type="date" name="date"><br>
+        <select name="gender">
+            <option value="male">male</option>
+            <option value="female">female</option>
+        </select>
+        <div class="btn">
+            <button onclick="addPatient()">استكمال البيانات</button>
+            <button onclick="search()">بحث</button>
+        </div>
+    </div>
+    <div class="test">
+        <div class="switch">
+            <span class="snew">new test</span><span class="sOld">old test</span>
+        </div>
+        <div class="newTest">
+            <input oninput="addTest()" list="tests" type="text">
+            <datalist id="tests"></datalist>
+            <div class="tests"></div>
+            <div class="btn">
+                <button onclick="newp()">جديد</button>
+            </div>
+        </div>
+        <div class="oldTest hidden"></div>
+    </div>
+
+
+</body>
+<script>
+    let newTest=document.querySelector(".newTest") , oldTest=document.querySelector(".oldTest");
+    let spanNew=document.querySelector(".snew") , spanOld=document.querySelector(".sOld");
+    spanNew.classList.add('active')
+    spanNew.addEventListener("click",function() {
+        oldTest.classList.add('hidden');
+        newTest.classList.remove('hidden');
+        this.classList.add('active');
+        spanOld.classList.remove('active');
+    });
+    spanOld.addEventListener("click",function() {
+        oldTest.classList.remove('hidden');
+        newTest.classList.add('hidden');
+        this.classList.add('active');
+        spanNew.classList.remove('active');
+        getOldTest();
+
+    });
+    getid();
+    function getid() {
+        let id = document.querySelector('input[name=id]');
+        let idrequest = new XMLHttpRequest();
+        idrequest.open('post', '../settings/patients.php', true);
+        idrequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        idrequest.onreadystatechange = function () {
+            id.value = idrequest.responseText;
+        }
+        idrequest.send('state=id');
+    }
+    function Switch(notdetails) {
+        let details = document.querySelector('.details');
+        let test = document.querySelector('.test');
+        if (notdetails) {
+            details.style.display = 'none';
+            test.style.display = 'inherit';
+        } else {
+            details.style.display = 'inherit';
+            test.style.display = 'none';
+        }
+    }
+    function addPatient() {
+        let details = document.querySelector('.details');
+        let test = document.getElementById('tests');
+        let data = document.querySelectorAll('input:not(input[list="tests"]) , select');
+        let keys = '';
+        let values = '';
+        data.forEach(function (el, i) {
+            if (el.value == "") {
+                values = '';
+                alert(el.name + " mustn't be empty");
+            } else {
+                keys += `${el.name}` + ",";
+                values += "'" + el.value + "',";
+            }
+        });
+
+        if (values == "'male'," || values == '') {
+            return;
+        }
+        let add = new XMLHttpRequest();
+        add.open('post', '../settings/patients.php', true);
+        add.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        add.onreadystatechange = function () {
+            Switch(true);
+            test.innerHTML = add.responseText;
+        }
+        add.send(`state=add1&keys=${keys.substring(0, keys.length - 1)}&values=${values.substring(0, values.length - 1)}`);
+        getTest();
+    }
+    function addTest() {
+        let t = document.querySelector('input[list="tests"]');
+        let contan = document.querySelector(".tests")
+        let add2 = new XMLHttpRequest();
+        add2.open('post', '../settings/patients.php', true);
+        add2.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        add2.onreadystatechange = function () {
+            contan.innerHTML = add2.responseText;
+        }
+        add2.send(`state=add2&id=${document.querySelector("input[name=id]").value}&test=${t.value}`);
+        t.value = "";
+    }
+    function getTest() {
+        let contan = document.querySelector(".tests")
+        let get = new XMLHttpRequest();
+        get.open('post', '../settings/patients.php', true);
+        get.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        get.onreadystatechange = function () {
+            contan.innerHTML = get.responseText;
+            console.log(get.responseText);
+        }
+        get.send(`state=getTest&id=${document.querySelector("input[name=id]").value}`);
+    }
+    function getOldTest() {
+        let contan = document.querySelector(".oldTest")
+        let get = new XMLHttpRequest();
+        get.open('post', '../settings/patients.php', true);
+        get.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        get.onreadystatechange = function () {
+            contan.innerHTML = get.responseText;
+            console.log(get.responseText);
+        }
+        get.send(`state=getOLdTest&id=${document.querySelector("input[name=id]").value}`);
+    }
+    function newp() {
+        let data = document.querySelectorAll('input:not(input[list="tests"]) , select');
+        data.forEach(function (el, i) {
+            el.value = "";
+        });
+        getid();
+        Switch(false);
+    }
+    function search() {
+        let data = document.querySelectorAll('input:not(input[list="tests"]) , select');
+        let search = new XMLHttpRequest();
+        search.open('post', '../settings/patients.php', true);
+        search.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        search.onreadystatechange = function () {
+            if (Object.keys(JSON.parse(search.responseText)).length > 0) {
+                let datap = JSON.parse(search.responseText);
+                data.forEach(function (el, i) {
+                    el.value = datap[`${el.name}`];
+                });
+            } else {
+                alert("patient not fount");
+            }
+        }
+        search.send(`state=search&id=${document.querySelector("input[name=id]").value}`);
+    }
+    function printTest(className){
+        
+        let data=new Object();
+        document.querySelectorAll(`.${className} .test_p`).forEach(test=>{
+            data[test.innerText.split(" : ")[0]]=test.innerText.split(" : ")[1]
+            
+        });
+           window.open(`results/result.html?name=${document.querySelector("input[placeholder='Name']").value}&date=${document.querySelector(`.${className} .date`).innerText}&tests=${JSON.stringify(data)}`);
+    }
+
+</script>
+
+</html>
